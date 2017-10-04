@@ -48,3 +48,8 @@ On CPU
 ```
 python train.py --gpus "" --epoch 0
 ```
+
+On a g3.4xlarge instance I was able to train with the following:
+```
+./train.py --gpus "0" --epoch 0 --batch-size 16
+```
