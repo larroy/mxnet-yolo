@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import argparse
 import tools.find_mxnet
 import mxnet as mx
@@ -98,6 +101,7 @@ if __name__ == '__main__':
                             args.data_shape,
                             (args.mean_r, args.mean_g, args.mean_b),
                             ctx, args.nms_thresh, args.force_nms)
+    print("\nGot detector and image list = " + str(image_list))
     # run detection
     detector.detect_and_visualize(image_list, args.dir, args.extension,
                                   CLASSES, args.thresh, args.show_timer)

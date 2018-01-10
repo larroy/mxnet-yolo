@@ -175,14 +175,12 @@ class DetIter(mx.io.DataIter):
 
     @property
     def provide_data(self):
-        return [(k, v.shape) for k, v in self._data.items()]
+        #return [(k, v.shape) for k, v in self._data.items()]
+        return [mx.io.DataDesc('data', self._data.shape)]
 
     @property
     def provide_label(self):
-        if self.is_train:
-            return [(k, v.shape) for k, v in self._label.items()]
-        else:
-            return [(k, v.shape) for k, v in self._label.items()]
+        return [mx.io.DataDesc('yolo_output_label', self._label.shape)]
 
     def reset(self):
         self._current = 0
@@ -195,9 +193,10 @@ class DetIter(mx.io.DataIter):
     def next(self):
         if self.iter_next():
             self._get_batch()
-            data_batch = mx.io.DataBatch(data=self._data.values(),
-                                   label=self._label.values(),
-                                   pad=self.getpad(), index=self.getindex())
+            data_batch = mx.io.DataBatch(data=[self._data],
+                label=[self._label],
+                pad=self.getpad(),
+                index=self.getindex())
             self._current += self.batch_size
             return data_batch
         else:
@@ -235,11 +234,11 @@ class DetIter(mx.io.DataIter):
             batch_data[i] = data
             if self.is_train:
                 batch_label.append(label)
-        self._data = {'data': batch_data}
-        if self.is_train:
-            self._label = {'yolo_output_label': mx.nd.array(np.array(batch_label))}
+        self._data = batch_data
+        if not self.is_train:
+            self._label = mx.nd.zeros((1, 2, 5))  # fake label
         else:
-            self._label = {'yolo_output_label': mx.nd.zeros((1, 2, 5))}  # fake label
+            self._label = mx.nd.array(batch_label)
 
     def _data_augmentation(self, data, label):
         """
